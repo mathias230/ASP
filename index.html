@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>America Pro Clubs - ASP</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-circle">
+                    <img src="/img/ASP Logo.png" alt="ASP LOGO" class="logo-img">
+                </div>
+                <span>ASP</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#inicio" class="nav-link">Inicio</a></li>
+                <li><a href="#liga" class="nav-link">La Liga</a></li>
+                <li><a href="#clubes" class="nav-link">Clubes</a></li>
+                <li><a href="#temporada" class="nav-link">Temporada</a></li>
+                <li><a href="clips.html" class="nav-link">Clips</a></li>
+                <li><a href="jugadores.html" class="nav-link">Jugadores</a></li>
+                <li><a href="standings.html" class="nav-link">Posiciones</a></li>
+                <li><a href="#contacto" class="nav-link">Contacto</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+        <div class="hero-background">
+            <div class="floating-particles"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title" id="main-title">
+                <span class="typewriter-text"></span>
+            </h1>
+            <p class="hero-subtitle">La busqueda por la gloria De America</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">8</span>
+                    <span class="stat-label">Clubes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">88</span>
+                    <span class="stat-label">Jugadores</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">2025</span>
+                    <span class="stat-label">Temporada</span>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- About League Section -->
+    <section id="liga" class="about-league">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Sobre la Liga</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="league-content">
+                <div class="league-text">
+                    <h3>AMERICA PRO CLU8S</h3>
+                    <p>📣 ¡Bienvenidos a America Pro Clubs! ⚽
+                        La mejor liga del mundo ha llegado.</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <i class="fas fa-gamepad"></i>
+                            <h4>Competencia Elite</h4>
+                            <p>🎮 Competimos en el modo Clubes Pro de FIFA / 
+                                🏆 Torneos, rankings y premios
+                                🔥 Equipos 100% Competitivos.</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-trophy"></i>
+                            <h4>Premios Exclusivos</h4>
+                            <p>Premios en efectivo, Diversion y profesionalidad.</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <i class="fas fa-users"></i>
+                            <h4>Comunidad</h4>
+                            <p>Una comunidad vibrante de fanáticos y jugadores apasionados por el fútbol virtual.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clubs Section -->
+    <section id="clubes" class="clubs-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nuestros Clubes</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="clubs-grid">
+                <!-- Los clubes se cargarán dinámicamente desde la API -->
+                <div class="loading-message">
+                    <p>Cargando clubes...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clips Section -->
+    <section id="clips" class="clips-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Los Mejores Clips de la ASP</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="clips-content">
+                <div class="clips-preview" id="recentClipsPreview">
+                    <!-- Los 3 clips más recientes se cargarán aquí dinámicamente -->
+                    <div class="loading-clips">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando clips más recientes...</p>
+                    </div>
+                </div>
+                
+                <div class="clips-cta">
+                    <p>¿Quieres ver más clips increíbles o subir los tuyos?</p>
+                    <a href="clips.html" class="btn-primary clips-btn">
+                        <i class="fas fa-video"></i>
+                        Ver Más Clips
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Season Section -->
+    <section id="temporada" class="season-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Temporada 2025</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="season-content">
+                <div class="season-info">
+                    <h3>Formato de Competencia</h3>
+                    <p>La temporada 2025 de la ASP presenta un formato renovado que garantiza la máxima emoción y competitividad. Con 12 equipos.</p>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">Julio</div>
+                            <div class="timeline-content">
+                                <h4>Fase Regular</h4>
+                                <p>4 jornadas de Liga</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Julio</div>
+                            <div class="timeline-content">
+                                <h4>Playoffs</h4>
+                                <p>Los mejores 8 equipos compiten por el título</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Junio</div>
+                            <div class="timeline-content">
+                                <h4>Gran Final</h4>
+                                <p>La culminación de la temporada en un evento especial</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="prize-pool">
+                    <h3>Premio Total</h3>
+                    <div class="prize-amount">Banner</div>
+                    <p>Para el campeon de la Liga</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Únete a la Liga</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>¿Quieres formar parte de la ASP?</h3>
+                    <p>Si tienes lo que se necesita para competir al más alto nivel en Panamá, contáctanos para más información sobre cómo unirte a nuestra liga.</p>
+                    
+                    <div class="contact-methods">
+                       
+                        
+                        <a href="https://www.instagram.com/ligapcppanama?igsh=MXY3Z2lha3NiOGt1MA%3D%3D" target="_blank" class="contact-item contact-link">
+                            <i class="fab fa-instagram"></i>
+                            <span>@ligapcppanama</span>
+                        </a>
+                        
+                        </a>
+                        <a href="mailto:ligapanamenaclubespro@gmail.com" class="contact-item contact-link">
+                            <i class="fas fa-envelope"></i>
+                            <span>ligapanamenaclubespro@gmail.com</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-trophy"></i>
+                    <span>ASP</span>
+                </div>
+                <p>&copy; 2025 ASP/ AMERICA PRO Clubs. Diseño por: Web Zen design Studio.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Socket.IO para actualizaciones en tiempo real -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Script principal para gestión dinámica de clubes -->
+    <script src="main.js"></script>
+    
+    <!-- Script original -->
+    <script src="script.js"></script>
+</body>
+</html>

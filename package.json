@@ -1,0 +1,36 @@
+{
+  "name": "lpcp-clips-server",
+  "version": "1.0.0",
+  "description": "Servidor backend para la Liga Panameña de Clubes Pro - Sistema de clips en tiempo real",
+  "main": "server-clean.js",
+  "scripts": {
+    "start": "node server-clean.js",
+    "dev": "nodemon server-clean.js",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "football",
+    "clips",
+    "real-time",
+    "panama",
+    "liga"
+  ],
+  "author": "LPCP Development Team",
+  "license": "MIT",
+  "dependencies": {
+    "cloudinary": "^1.41.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.17.0",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

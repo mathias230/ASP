@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Posiciones - AMERICA PRO CLUBS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-circle">
+                    <img src="/img/ASP LOGO.png" alt="ASP LOGO" class="logo-img">
+                </div>
+                <span>ASP</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="index.html#liga" class="nav-link">La Liga</a></li>
+                <li><a href="index.html#clubes" class="nav-link">Clubes</a></li>
+                <li><a href="index.html#temporada" class="nav-link">Temporada</a></li>
+                <li><a href="clips.html" class="nav-link">Clips</a></li>
+                <li><a href="jugadores.html" class="nav-link">Jugadores</a></li>
+                <li><a href="standings.html" class="nav-link active">Posiciones</a></li>
+                <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Standings Hero Section -->
+    <section class="standings-hero">
+        <div class="hero-background">
+            <div class="floating-particles"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="typewriter-text">Tabla de Posiciones</span>
+            </h1>
+            <p class="hero-subtitle">Clasificación actual de la AMERICA PRO CLUBS</p>
+            
+            <!-- Season Info -->
+            <div class="season-info">
+                <div class="season-stat">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Temporada 2025</span>
+                </div>
+                <div class="season-stat">
+                    <i class="fas fa-futbol"></i>
+                    <span id="currentMatchday">Jornada 1</span>
+                </div>
+                <div class="season-stat">
+                    <i class="fas fa-users"></i>
+                    <span>12 Equipos</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="standings-content">
+        <div class="container">
+
+            
+            <!-- Navigation Tabs -->
+            <div class="standings-tabs">
+                <button class="tab-btn active" data-tab="table">
+                    <i class="fas fa-table"></i>
+                    Tabla de Posiciones
+                </button>
+                <button class="tab-btn" data-tab="fixtures">
+                    <i class="fas fa-calendar-check"></i>
+                    Partidos
+                </button>
+                <button class="tab-btn" data-tab="results">
+                    <i class="fas fa-history"></i>
+                    Resultados
+                </button>
+                <button class="tab-btn" data-tab="playoffs">
+                    <i class="fas fa-trophy"></i>
+                    Playoffs
+                </button>
+                <button class="tab-btn" data-tab="schedule">
+                    <i class="fas fa-clock"></i>
+                    Calendario
+                </button>
+                <button class="tab-btn" data-tab="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    Estadísticas
+                </button>
+            </div>
+
+            <!-- Standings Table Tab -->
+            <div class="tab-content active" id="table">
+                <div class="standings-table-container">
+                    <h2 class="section-title">
+                        <i class="fas fa-trophy"></i>
+                        Clasificación General
+                    </h2>
+                    
+                    <div class="table-wrapper">
+                        <table class="standings-table">
+                            <thead>
+                                <tr>
+                                    <th class="pos-col">#</th>
+                                    <th class="team-col">Equipo</th>
+                                    <th class="stat-col">PJ</th>
+                                    <th class="stat-col">PG</th>
+                                    <th class="stat-col">PE</th>
+                                    <th class="stat-col">PP</th>
+                                    <th class="stat-col">GF</th>
+                                    <th class="stat-col">GC</th>
+                                    <th class="stat-col">DG</th>
+                                    <th class="points-col">PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standingsTableBody">
+                                <!-- Standings will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Fixtures Tab -->
+            <div class="tab-content fixtures-section" id="fixtures">
+                <div class="fixtures-container" id="fixturesContainer">
+                    <!-- Contenido generado dinámicamente por JavaScript -->
+                    <div class="loading-fixtures">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando partidos...</p>
+                    </div>
+                </div>
+                
+                <div class="fixtures-grid" id="fixturesGrid">
+                    <!-- Partidos se cargan aquí dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Results Tab -->
+            <div class="tab-content" id="results">
+                <div class="results-container" id="resultsContainer">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Resultados Recientes
+                    </h2>
+                    
+                    <!-- La navegación se genera dinámicamente por JavaScript -->
+                    <div class="loading-results">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando resultados...</p>
+                    </div>
+                </div>
+                
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- Playoffs Tab -->
+            <div class="tab-content" id="playoffs">
+                <div class="playoffs-container">
+                    <h2 class="section-title">
+                        <i class="fas fa-trophy"></i>
+                        Playoffs - Cuartos de Final
+                    </h2>
+                    
+                    <div class="playoffs-info">
+                        <div class="qualification-info">
+                            <h3><i class="fas fa-info-circle"></i> Clasificación</h3>
+                            <p>Los equipos en posiciones 1-8 clasifican a los playoffs</p>
+                            <div class="playoff-format">
+                                <div class="format-item">
+                                    <span class="seed">1º vs 8º</span>
+                                    <span class="seed">2º vs 7º</span>
+                                </div>
+                                <div class="format-item">
+                                    <span class="seed">3º vs 6º</span>
+                                    <span class="seed">4º vs 5º</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px; text-align: center;">
+                        <button onclick="loadPlayoffs()" style="background: #00ff88; color: black; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                            🔄 Recargar Bracket
+                        </button>
+                    </div>
+                    
+                    <div class="playoffs-bracket-visual">
+                        <!-- Cuartos de Final -->
+                        <div class="bracket-column quarterfinals">
+                            <h3 class="round-title">Cuartos de Final</h3>
+                            
+                            <div class="bracket-match-container">
+                                <div class="bracket-match">
+                                    <div class="team-box top">
+                                        <span class="seed">1</span>
+                                        <span class="team-name">1º Clasificado</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="seed">8</span>
+                                        <span class="team-name">8º Clasificado</span>
+                                    </div>
+                                    <div class="connector-right"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bracket-match-container">
+                                <div class="bracket-match">
+                                    <div class="team-box top">
+                                        <span class="seed">4</span>
+                                        <span class="team-name">4º Clasificado</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="seed">5</span>
+                                        <span class="team-name">5º Clasificado</span>
+                                    </div>
+                                    <div class="connector-right"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bracket-match-container">
+                                <div class="bracket-match">
+                                    <div class="team-box top">
+                                        <span class="seed">2</span>
+                                        <span class="team-name">2º Clasificado</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="seed">7</span>
+                                        <span class="team-name">7º Clasificado</span>
+                                    </div>
+                                    <div class="connector-right"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bracket-match-container">
+                                <div class="bracket-match">
+                                    <div class="team-box top">
+                                        <span class="seed">3</span>
+                                        <span class="team-name">3º Clasificado</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="seed">6</span>
+                                        <span class="team-name">6º Clasificado</span>
+                                    </div>
+                                    <div class="connector-right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Semifinales -->
+                        <div class="bracket-column semifinals">
+                            <h3 class="round-title">Semifinales</h3>
+                            
+                            <div class="bracket-match-container large">
+                                <div class="bracket-match">
+                                    <div class="team-box top">
+                                        <span class="team-name">Ganador QF1</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="team-name">Ganador QF2</span>
+                                    </div>
+                                    <div class="connector-right"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bracket-match-container large">
+                                <div class="bracket-match">
+                                    <div class="team-box top">
+                                        <span class="team-name">Ganador QF3</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="team-name">Ganador QF4</span>
+                                    </div>
+                                    <div class="connector-right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Final -->
+                        <div class="bracket-column final">
+                            <h3 class="round-title">Final</h3>
+                            
+                            <div class="bracket-match-container final-container">
+                                <div class="bracket-match final-match">
+                                    <div class="team-box top">
+                                        <span class="team-name">Ganador SF1</span>
+                                    </div>
+                                    <div class="team-box bottom">
+                                        <span class="team-name">Ganador SF2</span>
+                                    </div>
+                                    <div class="trophy-icon">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="playoffs-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Los equipos se asignarán automáticamente cuando termine la fase regular</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Schedule Tab -->
+            <div class="tab-content" id="schedule">
+                <div class="schedule-container">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Calendario Completo
+                    </h2>
+                    
+                    <div class="schedule-overview">
+                        <div class="schedule-stats">
+                            <div class="schedule-stat">
+                                <i class="fas fa-play"></i>
+                                <span id="totalMatches">0</span>
+                                <small>Partidos Totales</small>
+                            </div>
+                            <div class="schedule-stat">
+                                <i class="fas fa-check"></i>
+                                <span id="playedMatches">0</span>
+                                <small>Jugados</small>
+                            </div>
+                            <div class="schedule-stat">
+                                <i class="fas fa-clock"></i>
+                                <span id="remainingMatches">0</span>
+                                <small>Por Jugar</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-timeline" id="scheduleTimeline">
+                        <!-- Schedule timeline will be loaded here dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="tab-content" id="stats">
+                <div class="stats-container">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Estadísticas de la Liga
+                    </h2>
+                    
+                    <div class="stats-grid">
+                        <!-- Top Scorers Section -->
+                        <div class="stats-section">
+                            <div class="stats-header">
+                                <h3 class="stats-title">
+                                    <i class="fas fa-futbol"></i>
+                                    Tabla de Goleadores
+                                </h3>
+                            </div>
+                            <div class="stats-table-container">
+                                <table class="stats-table" id="topScorersTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="rank-col">#</th>
+                                            <th class="player-col">Jugador</th>
+                                            <th class="team-col">Equipo</th>
+                                            <th class="goals-col">Goles</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="topScorersList">
+                                        <!-- Top scorers will be loaded here dynamically -->
+                                        <tr class="no-data">
+                                            <td colspan="4">
+                                                <i class="fas fa-info-circle"></i>
+                                                No hay datos de goleadores disponibles
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top Assists Section -->
+                        <div class="stats-section">
+                            <div class="stats-header">
+                                <h3 class="stats-title">
+                                    <i class="fas fa-hands-helping"></i>
+                                    Tabla de Asistencias
+                                </h3>
+                            </div>
+                            <div class="stats-table-container">
+                                <table class="stats-table" id="topAssistsTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="rank-col">#</th>
+                                            <th class="player-col">Jugador</th>
+                                            <th class="team-col">Equipo</th>
+                                            <th class="assists-col">Asistencias</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="topAssistsList">
+                                        <!-- Top assists will be loaded here dynamically -->
+                                        <tr class="no-data">
+                                            <td colspan="4">
+                                                <i class="fas fa-info-circle"></i>
+                                                No hay datos de asistencias disponibles
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Stats Summary -->
+                    <div class="stats-summary">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-futbol"></i>
+                            </div>
+                            <div class="summary-info">
+                                <span class="summary-number" id="totalGoals">0</span>
+                                <span class="summary-label">Goles Totales</span>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <div class="summary-info">
+                                <span class="summary-number" id="totalAssists">0</span>
+                                <span class="summary-label">Asistencias Totales</span>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="summary-info">
+                                <span class="summary-number" id="avgGoalsPerMatch">0.0</span>
+                                <span class="summary-label">Promedio Goles/Partido</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Match Details Modal -->
+    <div id="matchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="matchModalTitle">Detalles del Partido</h2>
+                <span class="close" id="matchModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="match-details" id="matchDetails">
+                    <!-- Match details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-trophy"></i>
+                    <span>ASP</span>
+                </div>
+                <p>&copy; 2025 AMERICA PRO CLUBS. Diseño por: Web Zen design Studio.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Debug: Verificar que los elementos existen antes de cargar standings.js
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 DEBUG: Verificando elementos...');
+            
+            // Verificar botones
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            console.log('📊 Botones encontrados:', tabBtns.length);
+            tabBtns.forEach((btn, i) => {
+                console.log(`Botón ${i+1}: data-tab="${btn.getAttribute('data-tab')}"`);
+            });
+            
+            // Verificar contenedores
+            const tabContents = document.querySelectorAll('.tab-content');
+            console.log('📦 Contenedores encontrados:', tabContents.length);
+            tabContents.forEach((content, i) => {
+                console.log(`Contenedor ${i+1}: id="${content.id}"`);
+            });
+            
+            // Test manual de cambio de pestaña
+            window.testTab = function(tabId) {
+                console.log('🧪 TEST: Cambiando a', tabId);
+                
+                // Remover active de todos
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Activar específicos
+                const btn = document.querySelector(`[data-tab="${tabId}"]`);
+                const content = document.getElementById(tabId);
+                
+                if (btn) {
+                    btn.classList.add('active');
+                    console.log('✅ Botón activado');
+                } else {
+                    console.error('❌ Botón no encontrado');
+                }
+                
+                if (content) {
+                    content.classList.add('active');
+                    console.log('✅ Contenido activado');
+                } else {
+                    console.error('❌ Contenido no encontrado');
+                }
+            };
+            
+            console.log('💡 Usa testTab("fixtures") en la consola para probar');
+        });
+    </script>
+    <script src="standings.js"></script>
+</body>
+</html>

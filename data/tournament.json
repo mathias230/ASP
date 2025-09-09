@@ -1,0 +1,50 @@
+{
+  "teams": [
+    {
+      "id": 1754149361144,
+      "name": "ss",
+      "logo": "img/default-team.png"
+    }
+  ],
+  "tournament": {
+    "teams": [
+      {
+        "id": 1754149361144,
+        "name": "ss",
+        "logo": "img/default-team.png"
+      }
+    ],
+    "matches": [],
+    "standings": [],
+    "settings": {
+      "seasonName": "Temporada 2025",
+      "pointsWin": 3,
+      "pointsDraw": 1,
+      "pointsLoss": 0
+    },
+    "currentBracket": null
+  },
+  "players": [],
+  "clubs": [],
+  "clips": [
+    {
+      "id": "1754113407020",
+      "title": "triple atajada",
+      "description": "ff",
+      "type": "atajadas",
+      "club": "ss",
+      "filename": "lpcp-clips/lpcp-clips/clip-1754113401140-713898392",
+      "video_url": "https://res.cloudinary.com/dhj8sgwga/video/upload/v1754113402/lpcp-clips/lpcp-clips/clip-1754113401140-713898392.mp4",
+      "upload_date": "2025-08-02T05:43:27.020Z",
+      "views": 0,
+      "likes": 0,
+      "liked_by": []
+    }
+  ],
+  "stats": {
+    "total_clips": 1,
+    "total_views": 4,
+    "total_likes": 0
+  },
+  "lastQuickSave": "2025-08-02T16:30:50.227Z"
+}
