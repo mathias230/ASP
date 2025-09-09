@@ -1665,6 +1665,37 @@ body {
         gap: 0.5rem;
     }
 
+    /* Hide non-essential columns on mobile */
+    .standings-table th:nth-child(4), /* PG */
+    .standings-table th:nth-child(5), /* PE */
+    .standings-table th:nth-child(6), /* PP */
+    .standings-table th:nth-child(7), /* GF */
+    .standings-table th:nth-child(8), /* GC */
+    .standings-table td:nth-child(4),
+    .standings-table td:nth-child(5),
+    .standings-table td:nth-child(6),
+    .standings-table td:nth-child(7),
+    .standings-table td:nth-child(8) {
+        display: none;
+    }
+
+    /* Adjust remaining columns for mobile */
+    .standings-table th,
+    .standings-table td {
+        padding: 0.8rem 0.4rem;
+        font-size: 0.9rem;
+    }
+
+    .standings-table .team-col {
+        min-width: 120px;
+        text-align: left;
+    }
+
+    .standings-table .stat-col,
+    .standings-table .points-col {
+        min-width: 50px;
+    }
+
     .tab-btn {
         width: 100%;
     }
