@@ -6,19 +6,349 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadInitialData();
     initializeWebSocket(); // Inicializar WebSocket para sincronización
+    loadTransfers(); // Cargar transferencias
     
     // Poblar selectores de equipos para formulario de partidos
     setTimeout(() => {
         populateTeamSelects();
     }, 1000); // Esperar 1 segundo para que se carguen los equipos
     
+    // Setup transfer form
+    setupTransferForm();
+    setupQuickTransferForm();
+    
     console.log(' Panel de administración inicializado');
 });
+
+// ===== TRANSFERS FUNCTIONS =====
+
+// Cargar transferencias desde MongoDB
+async function loadTransfers() {
+    try {
+        const response = await fetch('/api/transfers');
+        if (response.ok) {
+            transfers = await response.json();
+            displayTransfers();
+        } else {
+            console.error('Error cargando transferencias:', response.statusText);
+            transfers = [];
+        }
+    } catch (error) {
+        console.error('Error cargando transferencias:', error);
+        transfers = [];
+    }
+}
+
+// Guardar transferencia en MongoDB
+async function saveTransfer(transferData) {
+    try {
+        console.log('Attempting to save transfer:', transferData);
+        
+        // Validar datos requeridos
+        if (!transferData.playerName || !transferData.position || !transferData.fromTeam || 
+            !transferData.toTeam || !transferData.type || !transferData.value || !transferData.date) {
+            throw new Error('Todos los campos son requeridos');
+        }
+        
+        const response = await fetch('/api/transfers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(transferData)
+        });
+        
+        if (response.ok) {
+            const savedTransfer = await response.json();
+            console.log('Transfer saved successfully:', savedTransfer);
+            return savedTransfer;
+        } else {
+            const errorData = await response.text();
+            console.error('Server error:', errorData);
+            throw new Error(`Error del servidor: ${response.status} - ${errorData}`);
+        }
+    } catch (error) {
+        console.error('Error guardando transferencia:', error);
+        throw error;
+    }
+}
+
+// Setup transfer form
+function setupTransferForm() {
+    const transferForm = document.getElementById('transferForm');
+    if (transferForm) {
+        transferForm.addEventListener('submit', handleTransferSubmit);
+    }
+}
+
+function setupQuickTransferForm() {
+    const quickTransferForm = document.getElementById('quickTransferForm');
+    if (quickTransferForm) {
+        quickTransferForm.addEventListener('submit', handleQuickTransferSubmit);
+    }
+}
+
+async function handleQuickTransferSubmit(e) {
+    e.preventDefault();
+    
+    try {
+        const transferData = {
+            playerName: document.getElementById('modalPlayerName').value,
+            position: document.getElementById('modalPlayerPosition').value,
+            fromTeam: document.getElementById('modalFromTeam').value,
+            toTeam: document.getElementById('modalToTeam').value,
+            type: document.getElementById('modalTransferType').value,
+            value: document.getElementById('modalTransferValue').value,
+            date: formatDate(document.getElementById('modalTransferDate').value)
+        };
+        
+        console.log('Sending transfer data:', transferData);
+        
+        const savedTransfer = await saveTransfer(transferData);
+        transfers.push(savedTransfer);
+        displayTransfers();
+        closeQuickTransferModal();
+        
+        // Mostrar notificación
+        showNotification('Transferencia rápida agregada', 'success');
+    } catch (error) {
+        console.error('Error in handleQuickTransferSubmit:', error);
+        showNotification('Error agregando transferencia: ' + error.message, 'error');
+    }
+}
+
+// Handle transfer form submission
+async function handleTransferSubmit(e) {
+    e.preventDefault();
+    
+    try {
+        const formData = new FormData(e.target);
+        const transferData = {
+            playerName: formData.get('transferPlayerName'),
+            position: formData.get('transferPlayerPosition'),
+            fromTeam: formData.get('transferFromTeam'),
+            toTeam: formData.get('transferToTeam'),
+            type: formData.get('transferType'),
+            value: formData.get('transferValue'),
+            date: formatDate(formData.get('transferDate'))
+        };
+        
+        console.log('Sending transfer data:', transferData);
+        
+        const savedTransfer = await saveTransfer(transferData);
+        transfers.push(savedTransfer);
+        
+        // Mostrar notificación
+        showNotification('Transferencia agregada exitosamente', 'success');
+        
+        // Limpiar formulario
+        e.target.reset();
+        
+        // Actualizar display
+        displayTransfers();
+    } catch (error) {
+        console.error('Error in handleTransferSubmit:', error);
+        showNotification('Error agregando transferencia: ' + error.message, 'error');
+    }
+}
+
+// Formatear fecha
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+// Mostrar transferencias en el admin
+function displayTransfers() {
+    const container = document.getElementById('adminTransfersGrid');
+    if (!container) return;
+    
+    if (transfers.length === 0) {
+        container.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; padding: 40px;">No hay transferencias registradas</p>';
+        return;
+    }
+    
+    container.innerHTML = transfers.map(transfer => `
+        <div class="transfer-card" style="background: rgba(255,255,255,0.05); border: 2px solid rgba(0,255,136,0.2); border-radius: 12px; padding: 20px; transition: all 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="background: ${transfer.type === 'cesion' ? 'rgba(255,165,0,0.2)' : 'rgba(0,255,136,0.2)'}; color: ${transfer.type === 'cesion' ? '#ffa500' : '#00ff88'}; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">${transfer.type.toUpperCase()}</span>
+                <span style="color: rgba(255,255,255,0.6); font-size: 14px;">${transfer.date}</span>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <div style="color: #00ff88; font-size: 18px; font-weight: 600; margin-bottom: 5px;">${transfer.playerName}</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 14px;">${transfer.position}</div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="text-align: center; flex: 1;">
+                    <div style="color: rgba(255,255,255,0.9); font-weight: 600;">${transfer.fromTeam}</div>
+                </div>
+                <div style="color: #00ff88;">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="color: rgba(255,255,255,0.9); font-weight: 600;">${transfer.toTeam}</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 10px; background: rgba(0,255,136,0.1); border-radius: 8px; margin-bottom: 15px;">
+                <div style="color: #00ff88; font-weight: 600; font-size: 16px;">${transfer.value}</div>
+                <div style="color: rgba(255,255,255,0.6); font-size: 12px;">${transfer.type === 'cesion' ? 'Duración' : 'Valor de Transferencia'}</div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="deleteTransfer('${transfer._id}')" class="btn-delete" style="background: linear-gradient(45deg, #ff4757, #ff3838); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Eliminar transferencia
+window.deleteTransfer = async function(transferId) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta transferencia?')) {
+        try {
+            const response = await fetch(`/api/transfers/${transferId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                transfers = transfers.filter(t => t._id !== transferId);
+                displayTransfers();
+                showNotification('Transferencia eliminada', 'success');
+            } else {
+                throw new Error('Error eliminando transferencia');
+            }
+        } catch (error) {
+            console.error('Error eliminando transferencia:', error);
+            showNotification('Error eliminando transferencia', 'error');
+        }
+    }
+};
+
+// Toggle transfer value field based on type
+window.toggleTransferValueField = function() {
+    const typeSelect = document.getElementById('transferType');
+    const valueLabel = document.getElementById('transferValueLabel');
+    const valueInput = document.getElementById('transferValue');
+    
+    if (typeSelect.value === 'cesion') {
+        valueLabel.textContent = 'Duración de Cesión';
+        valueInput.placeholder = 'Ej: Cesión 6 meses, Cesión 1 año';
+    } else {
+        valueLabel.textContent = 'Valor de Transferencia';
+        valueInput.placeholder = 'Ej: $250,000, €150,000';
+    }
+};
+
+// Modal functions for transfers
+function showQuickTransferModal() {
+    const modal = document.getElementById('quickTransferModal');
+    if (modal) {
+        modal.style.display = 'block';
+        // Set today's date as default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('modalTransferDate').value = today;
+    }
+}
+
+function closeQuickTransferModal() {
+    const modal = document.getElementById('quickTransferModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('quickTransferForm').reset();
+    }
+}
+
+function showPlayerSelectModal() {
+    const modal = document.getElementById('playerSelectModal');
+    if (modal) {
+        modal.style.display = 'block';
+        loadTeamsForSelection();
+    }
+}
+
+function closePlayerSelectModal() {
+    const modal = document.getElementById('playerSelectModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('playersContainer').style.display = 'none';
+    }
+}
+
+function loadTeamsForSelection() {
+    const teams = JSON.parse(localStorage.getItem('teams') || '[]');
+    const teamButtons = document.getElementById('teamButtons');
+    
+    if (teamButtons) {
+        teamButtons.innerHTML = teams.map(team => `
+            <button type="button" onclick="loadPlayersForTeam('${team.name}')" 
+                    style="padding: 10px 15px; background: linear-gradient(45deg, #00d4ff, #0099cc); 
+                           border: none; color: white; border-radius: 8px; cursor: pointer; 
+                           font-weight: 600; transition: all 0.3s ease;">
+                ${team.name}
+            </button>
+        `).join('');
+    }
+}
+
+function loadPlayersForTeam(teamName) {
+    const players = JSON.parse(localStorage.getItem('players') || '[]');
+    const teamPlayers = players.filter(player => player.team === teamName);
+    const playersList = document.getElementById('playersList');
+    const playersContainer = document.getElementById('playersContainer');
+    
+    if (playersList && playersContainer) {
+        playersContainer.style.display = 'block';
+        playersList.innerHTML = teamPlayers.map(player => `
+            <div onclick="selectPlayerForTransfer('${player.name}', '${player.position}', '${teamName}')"
+                 style="padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; 
+                        cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;">
+                <h4 style="color: #00ff88; margin: 0 0 5px 0;">${player.name}</h4>
+                <p style="color: rgba(255,255,255,0.7); margin: 0; font-size: 14px;">${player.position}</p>
+            </div>
+        `).join('');
+    }
+}
+
+function selectPlayerForTransfer(playerName, position, fromTeam) {
+    // Close player select modal
+    closePlayerSelectModal();
+    
+    // Open transfer modal with pre-filled data
+    showQuickTransferModal();
+    
+    // Pre-fill the form
+    document.getElementById('modalPlayerName').value = playerName;
+    document.getElementById('modalPlayerPosition').value = position;
+    document.getElementById('modalFromTeam').value = fromTeam;
+}
+
+function toggleModalValueField() {
+    const typeSelect = document.getElementById('modalTransferType');
+    const valueLabel = document.getElementById('modalValueLabel');
+    const valueInput = document.getElementById('modalTransferValue');
+    
+    if (typeSelect && valueLabel && valueInput) {
+        if (typeSelect.value === 'cesion') {
+            valueLabel.textContent = 'Duración';
+            valueInput.placeholder = 'Ej: 6 meses, 1 año';
+        } else {
+            valueLabel.textContent = 'Valor';
+            valueInput.placeholder = 'Ej: $500K, €1M';
+        }
+    }
+};
 
 // Global variables
 let teams = [];
 let clubs = [];
 let players = [];
+let transfers = [];
 
 // Funciones de equipos (disponibles globalmente desde el inicio)
 window.editTeam = function(teamId) {
@@ -961,9 +1291,13 @@ async function loadTeamsForPlayerManagement() {
         const response = await fetch('/api/teams');
         if (!response.ok) throw new Error('Error fetching teams');
         
-        const teams = await response.json();
-        console.log('🏆 Equipos obtenidos para pestañas:', teams.length, teams);
-        renderTeamTabs(teams);
+        const teamsData = await response.json();
+        console.log('🏆 Equipos obtenidos para pestañas:', teamsData.length, teamsData);
+        
+        // Actualizar variable global teams
+        teams = teamsData;
+        
+        renderTeamTabs(teamsData);
         
     } catch (error) {
         console.error('❌ Error loading teams:', error);
@@ -5652,12 +5986,26 @@ function renderMatches() {
 }
 
 // Función para cargar pestañas de equipos automáticamente
-function loadTeamTabs() {
+async function loadTeamTabs() {
     console.log('🏆 CARGANDO PESTAÑAS DE EQUIPOS EN TIEMPO REAL...');
     const teamTabs = document.getElementById('teamTabs');
     if (!teamTabs) {
         console.warn('⚠️ teamTabs no encontrado');
         return;
+    }
+    
+    // Asegurar que tenemos los equipos cargados
+    if (!teams || teams.length === 0) {
+        console.log('🔄 Cargando equipos desde API...');
+        try {
+            const response = await fetch('/api/teams');
+            if (response.ok) {
+                teams = await response.json();
+                console.log('✅ Equipos cargados:', teams.length);
+            }
+        } catch (error) {
+            console.error('❌ Error cargando equipos:', error);
+        }
     }
     
     if (!teams || teams.length === 0) {
@@ -6199,10 +6547,13 @@ function switchTab(tabName) {
     // Cargar contenido específico según la pestaña
     switch (tabName) {
         case 'teams':
+            setupTransferForm();
+            setupQuickTransferForm();
+            setupOCRVerification();
             loadTeams();
-            break;
-        case 'clubs':
             loadClubs();
+            loadPlayers();
+            loadTransfers();
             break;
         case 'matches':
             loadMatches();
@@ -6222,7 +6573,8 @@ function switchTab(tabName) {
             loadTableConfig();
             break;
         case 'players':
-            loadTeamTabs();
+            console.log('🎯 Cargando pestaña de jugadores...');
+            loadPlayers(); // Cargar jugadores desde MongoDB primero
             setupPlayerEventListeners();
             break;
         case 'playoffs':

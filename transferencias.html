@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transferencias - AMERICA PRO CLUBS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-circle">
+                    <img src="/img/ASP LOGO.png" alt="ASP LOGO" class="logo-img">
+                </div>
+                <span>ASP</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="index.html#liga" class="nav-link">La Liga</a></li>
+                <li><a href="index.html#clubes" class="nav-link">Clubes</a></li>
+                <li><a href="index.html#temporada" class="nav-link">Temporada</a></li>
+                <li><a href="clips.html" class="nav-link">Clips</a></li>
+                <li><a href="jugadores.html" class="nav-link">Jugadores</a></li>
+                <li><a href="standings.html" class="nav-link">Posiciones</a></li>
+                <li><a href="transferencias.html" class="nav-link active">Transferencias</a></li>
+                <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Transfers Hero Section -->
+    <section class="transfers-hero">
+        <div class="hero-background">
+            <div class="floating-particles"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="typewriter-text">Mercado de Transferencias</span>
+            </h1>
+            <p class="hero-subtitle">Los movimientos más importantes de la AMERICA PRO CLUBS</p>
+            
+            <!-- Season Info -->
+            <div class="season-info">
+                <div class="season-stat">
+                    <div class="stat-number" id="totalTransfers">0</div>
+                    <div class="stat-label">Transferencias</div>
+                </div>
+                <div class="season-stat">
+                    <div class="stat-number" id="totalValue">$0</div>
+                    <div class="stat-label">Valor Total</div>
+                </div>
+                <div class="season-stat">
+                    <div class="stat-number" id="totalLoans">0</div>
+                    <div class="stat-label">Cesiones</div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="transfers-content">
+        <div class="hero-background">
+            <div class="floating-particles"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <div class="transfers-tabs">
+                <button class="tab-btn active" data-tab="recientes">
+                    <i class="fas fa-clock"></i>
+                    Recientes
+                </button>
+                <button class="tab-btn" data-tab="todas">
+                    <i class="fas fa-list"></i>
+                    Todas
+                </button>
+                <button class="tab-btn" data-tab="cesiones">
+                    <i class="fas fa-handshake"></i>
+                    Cesiones
+                </button>
+                <button class="tab-btn" data-tab="valores">
+                    <i class="fas fa-chart-line"></i>
+                    Por Valor
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content-container">
+                <!-- Recent Transfers Tab -->
+                <div id="recientes" class="tab-content active">
+                    <div class="transfers-grid" id="recent-transfers">
+                        <!-- Content will be loaded by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- All Transfers Tab -->
+                <div id="todas" class="tab-content">
+                    <div class="transfers-grid" id="all-transfers">
+                        <!-- Content will be loaded by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Loans Tab -->
+                <div id="cesiones" class="tab-content">
+                    <div class="transfers-grid" id="loans-transfers">
+                        <!-- Content will be loaded by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- By Value Tab -->
+                <div id="valores" class="tab-content">
+                    <div class="transfers-grid" id="value-transfers">
+                        <!-- Content will be loaded by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="transferencias.js"></script>
+    <script>
+        // Navigation toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (hamburger && navMenu) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

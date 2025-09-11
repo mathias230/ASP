@@ -132,7 +132,128 @@ const Team = mongoose.model('Team', TeamSchema);
 const Player = mongoose.model('Player', PlayerSchema);
 const Club = mongoose.model('Club', ClubSchema);
 const Match = mongoose.model('Match', MatchSchema);
+const TransferSchema = new mongoose.Schema({
+    playerName: { type: String, required: true },
+    position: { type: String, required: true },
+    fromTeam: { type: String, required: true },
+    toTeam: { type: String, required: true },
+    type: { type: String, required: true, enum: ['fichaje', 'cesion'] },
+    value: { type: String, required: true },
+    date: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
 const TournamentSettings = mongoose.model('TournamentSettings', TournamentSettingsSchema);
+const Transfer = mongoose.model('Transfer', TransferSchema);
+
+// ==================== TRANSFERS ENDPOINTS ====================
+
+// GET - Obtener todas las transferencias
+app.get('/api/transfers', async (req, res) => {
+    try {
+        const transfers = await Transfer.find().sort({ createdAt: -1 });
+        res.json(transfers);
+    } catch (error) {
+        console.error('Error obteniendo transferencias:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// POST - Crear nueva transferencia
+app.post('/api/transfers', async (req, res) => {
+    try {
+        const { playerName, position, fromTeam, toTeam, type, value, date } = req.body;
+        
+        const newTransfer = new Transfer({
+            playerName,
+            position,
+            fromTeam,
+            toTeam,
+            type,
+            value,
+            date
+        });
+        
+        const savedTransfer = await newTransfer.save();
+        
+        // Emitir evento de socket para actualización en tiempo real
+        io.emit('transferAdded', savedTransfer);
+        
+        res.status(201).json(savedTransfer);
+    } catch (error) {
+        console.error('Error creando transferencia:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// DELETE - Eliminar transferencia
+app.delete('/api/transfers/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const deletedTransfer = await Transfer.findByIdAndDelete(id);
+        
+        if (!deletedTransfer) {
+            return res.status(404).json({ error: 'Transferencia no encontrada' });
+        }
+        
+        // Emitir evento de socket para actualización en tiempo real
+        io.emit('transferDeleted', id);
+        
+        res.json({ message: 'Transferencia eliminada exitosamente' });
+    } catch (error) {
+        console.error('Error eliminando transferencia:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// GET - Obtener estadísticas de transferencias
+app.get('/api/transfers/stats', async (req, res) => {
+    try {
+        const totalTransfers = await Transfer.countDocuments();
+        const totalLoans = await Transfer.countDocuments({ type: 'cesion' });
+        
+        // Calcular valor total de fichajes
+        const fichajes = await Transfer.find({ type: 'fichaje' });
+        let totalValue = 0;
+        
+        fichajes.forEach(transfer => {
+            if (transfer.value) {
+                const valueStr = transfer.value.replace(/[^\d.]/g, '');
+                const numValue = parseFloat(valueStr);
+                
+                if (!isNaN(numValue)) {
+                    if (transfer.value.includes('M')) {
+                        totalValue += numValue * 1000000;
+                    } else if (transfer.value.includes('K')) {
+                        totalValue += numValue * 1000;
+                    } else {
+                        totalValue += numValue;
+                    }
+                }
+            }
+        });
+        
+        // Formatear valor total
+        let formattedValue;
+        if (totalValue >= 1000000) {
+            formattedValue = `$${(totalValue / 1000000).toFixed(1)}M`;
+        } else if (totalValue >= 1000) {
+            formattedValue = `$${(totalValue / 1000).toFixed(0)}K`;
+        } else {
+            formattedValue = `$${totalValue.toFixed(0)}`;
+        }
+        
+        res.json({
+            totalTransfers,
+            totalLoans,
+            totalValue: formattedValue
+        });
+    } catch (error) {
+        console.error('Error obteniendo estadísticas:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 // ==================== CLIPS TEMPORALES ====================
 let clips = [];
