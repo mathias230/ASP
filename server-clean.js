@@ -141,6 +141,18 @@ const SettingsSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+// Esquema para Sanciones
+const SanctionSchema = new mongoose.Schema({
+    teamId: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
+    teamName: { type: String, required: true },
+    points: { type: Number, required: true }, // Puede ser positivo o negativo
+    reason: { type: String, required: true },
+    date: { type: Date, default: Date.now },
+    matchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Match' }, // Opcional
+    status: { type: String, enum: ['active', 'revoked'], default: 'active' },
+    isPublic: { type: Boolean, default: false } // Control de visibilidad
+});
+
 // Copa schema eliminado
 
 // Esquema para Clips (solo metadatos, videos en Cloudinary)
@@ -167,6 +179,7 @@ const Club = mongoose.model('Club', ClubSchema);
 const Match = mongoose.model('Match', MatchSchema);
 const TournamentSettings = mongoose.model('TournamentSettings', TournamentSettingsSchema);
 const Settings = mongoose.model('Settings', SettingsSchema);
+const Sanction = mongoose.model('Sanction', SanctionSchema);
 const Clip = mongoose.model('Clip', ClipSchema);
 // Modelo Copa eliminado
 
@@ -830,24 +843,43 @@ async function calculateStandings() {
     try {
         console.log('🏆 Iniciando cálculo de tabla de posiciones...');
         
-        // Obtener todos los equipos y partidos terminados
-        const teams = await Team.find();
-        const finishedMatches = await Match.find({ status: 'finished' });
+        // Obtener todos los equipos, partidos terminados y sanciones activas
+        const [teams, finishedMatches, allSanctions] = await Promise.all([
+            Team.find(),
+            Match.find({ status: 'finished' }),
+            Sanction.find({ status: 'active' })
+        ]);
         
-        console.log(`📊 Equipos: ${teams.length}, Partidos terminados: ${finishedMatches.length}`);
+        console.log(`📊 Equipos: ${teams.length}, Partidos terminados: ${finishedMatches.length}, Sanciones activas: ${allSanctions.length}`);
         
-        // Inicializar estadísticas para cada equipo
-        const standings = teams.map(team => ({
-            teamId: team._id,
-            teamName: team.name,
-            played: 0,
-            won: 0,
-            drawn: 0,
-            lost: 0,
-            goalsFor: 0,
-            goalsAgainst: 0,
-            goalDifference: 0,
-            points: 0
+        // Inicializar estadísticas para cada equipo con sanciones
+        const standings = await Promise.all(teams.map(async (team) => {
+            // Calcular puntos de sanciones para este equipo
+            const teamSanctions = allSanctions.filter(s => 
+                s.teamId.toString() === team._id.toString()
+            );
+            
+            const sanctionPoints = teamSanctions.reduce((sum, s) => sum + s.points, 0);
+            
+            return {
+                teamId: team._id,
+                teamName: team.name,
+                played: 0,
+                won: 0,
+                drawn: 0,
+                lost: 0,
+                goalsFor: 0,
+                goalsAgainst: 0,
+                goalDifference: 0,
+                points: 0,
+                sanctionPoints: sanctionPoints,
+                sanctions: teamSanctions.map(s => ({
+                    points: s.points,
+                    reason: s.reason,
+                    isPublic: s.isPublic,
+                    date: s.date
+                }))
+            };
         }));
         
         // Procesar cada partido terminado
@@ -887,9 +919,16 @@ async function calculateStandings() {
             }
         });
         
-        // Calcular diferencia de goles
+        // Calcular diferencia de goles y aplicar sanciones
         standings.forEach(team => {
             team.goalDifference = team.goalsFor - team.goalsAgainst;
+            // Aplicar sanciones a los puntos (pueden ser positivas o negativas)
+            team.points += team.sanctionPoints;
+            
+            // Asegurarse de que los puntos no sean negativos
+            team.points = Math.max(0, team.points);
+            
+            console.log(`📊 ${team.teamName}: ${team.points - team.sanctionPoints} puntos + ${team.sanctionPoints} de sanciones = ${team.points} puntos totales`);
         });
         
         // Ordenar tabla por puntos, diferencia de goles, goles a favor
@@ -905,6 +944,7 @@ async function calculateStandings() {
         });
         
         console.log('✅ Tabla de posiciones calculada:', standings.length, 'equipos');
+        console.log('   - Sanciones aplicadas correctamente');
         
         return standings;
         
@@ -3036,6 +3076,177 @@ app.delete('/api/clubs/:id', async (req, res) => {
 
 
 
+
+// ==================== ENDPOINTS DE SANCIONES ====================
+
+// Obtener sanciones de un equipo (solo activas y públicas por defecto)
+app.get('/api/teams/:id/sanctions', async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        const showAll = req.query.showAll === 'true'; // ?showAll=true para ver todo
+        
+        const query = { 
+            teamId: new mongoose.Types.ObjectId(teamId), 
+            status: 'active' 
+        };
+        
+        if (!showAll) {
+            query.isPublic = true;
+        }
+        
+        const sanctions = await Sanction.find(query).sort({ date: -1 });
+        res.json(sanctions);
+        
+    } catch (error) {
+        console.error('❌ Error obteniendo sanciones:', error);
+        res.status(500).json({ error: 'Error obteniendo sanciones' });
+    }
+});
+
+// Obtener todas las sanciones (solo para administradores)
+app.get('/api/admin/sanctions', async (req, res) => {
+    try {
+        const sanctions = await Sanction.find().sort({ date: -1 });
+        res.json(sanctions);
+    } catch (error) {
+        console.error('❌ Error obteniendo sanciones (admin):', error);
+        res.status(500).json({ error: 'Error obteniendo sanciones' });
+    }
+});
+
+// Aplicar nueva sanción
+app.post('/api/sanctions', async (req, res) => {
+    try {
+        const { teamId, points, reason, matchId } = req.body;
+        
+        if (!teamId || points === undefined || !reason) {
+            return res.status(400).json({ error: 'Datos incompletos' });
+        }
+        
+        // Verificar que el equipo existe
+        const team = await Team.findById(teamId);
+        if (!team) {
+            return res.status(404).json({ error: 'Equipo no encontrado' });
+        }
+        
+        // Crear la sanción
+        const sanction = new Sanction({
+            teamId,
+            teamName: team.name,
+            points: Number(points),
+            reason,
+            matchId: matchId || null,
+            status: 'active',
+            isPublic: false // Por defecto no es pública
+        });
+        
+        await sanction.save();
+        
+        // Emitir evento de actualización
+        io.emit('sanctionAdded', sanction);
+        
+        res.status(201).json({
+            success: true,
+            message: 'Sanción aplicada correctamente',
+            sanction
+        });
+        
+    } catch (error) {
+        console.error('❌ Error aplicando sanción:', error);
+        res.status(500).json({ error: 'Error aplicando sanción' });
+    }
+});
+
+// Actualizar visibilidad de una sanción
+app.put('/api/sanctions/:id/visibility', async (req, res) => {
+    try {
+        const { isPublic } = req.body;
+        
+        const sanction = await Sanction.findByIdAndUpdate(
+            req.params.id,
+            { isPublic },
+            { new: true }
+        );
+        
+        if (!sanction) {
+            return res.status(404).json({ error: 'Sanción no encontrada' });
+        }
+        
+        // Emitir evento de actualización
+        io.emit('sanctionUpdated', sanction);
+        
+        res.json({
+            success: true,
+            message: 'Visibilidad actualizada',
+            sanction
+        });
+        
+    } catch (error) {
+        console.error('❌ Error actualizando visibilidad:', error);
+        res.status(500).json({ error: 'Error actualizando visibilidad' });
+    }
+});
+
+// Revocar sanción
+app.put('/api/sanctions/:id/revoke', async (req, res) => {
+    try {
+        const sanction = await Sanction.findByIdAndUpdate(
+            req.params.id,
+            { status: 'revoked' },
+            { new: true }
+        );
+        
+        if (!sanction) {
+            return res.status(404).json({ error: 'Sanción no encontrada' });
+        }
+        
+        // Emitir evento de actualización
+        io.emit('sanctionRevoked', { 
+            teamId: sanction.teamId, 
+            points: -sanction.points // Invertimos los puntos al revocar
+        });
+        
+        res.json({
+            success: true,
+            message: 'Sanción revocada correctamente',
+            sanction
+        });
+        
+    } catch (error) {
+        console.error('❌ Error revocando sanción:', error);
+        res.status(500).json({ error: 'Error revocando sanción' });
+    }
+});
+
+// Obtener total de puntos de sanciones de un equipo
+app.get('/api/teams/:id/sanctions/total', async (req, res) => {
+    try {
+        const teamId = req.params.id;
+        
+        const result = await Sanction.aggregate([
+            { 
+                $match: { 
+                    teamId: new mongoose.Types.ObjectId(teamId),
+                    status: 'active'
+                } 
+            },
+            {
+                $group: {
+                    _id: '$teamId',
+                    totalPoints: { $sum: '$points' }
+                }
+            }
+        ]);
+        
+        const totalPoints = result.length > 0 ? result[0].totalPoints : 0;
+        
+        res.json({ totalPoints });
+        
+    } catch (error) {
+        console.error('❌ Error calculando total de sanciones:', error);
+        res.status(500).json({ error: 'Error calculando total de sanciones' });
+    }
+});
 
 // ==================== WEBSOCKETS ====================
 io.on('connection', async (socket) => {

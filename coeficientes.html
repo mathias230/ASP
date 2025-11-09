@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coeficientes - AMERICA PRO CLUBS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YW5G583WMS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YW5G583WMS');
+    </script>
+    
+    <style>
+        .coeficientes-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 100px;
+        }
+
+        .coeficientes-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #00ff88;
+        }
+
+        .coeficientes-header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .coeficientes-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #00ff88;
+            color: #0a0a0a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .coeficientes-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #0a0a0a;
+            padding: 20px;
+            font-weight: 700;
+            display: grid;
+            grid-template-columns: 60px 80px 1fr 120px 120px 120px 120px 100px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .team-row {
+            display: grid;
+            grid-template-columns: 60px 80px 1fr 120px 120px 120px 120px 100px;
+            gap: 15px;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .team-row:hover {
+            background: rgba(0, 255, 136, 0.05);
+            transform: translateX(5px);
+        }
+
+        .team-position {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #00ff88;
+            text-align: center;
+        }
+
+        .team-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00ff88;
+        }
+
+        .team-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .coeficiente-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00ff88;
+            text-align: center;
+        }
+
+        .stat-value {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .coeficiente-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .badge-elite {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #0a0a0a;
+        }
+
+        .badge-pro {
+            background: linear-gradient(45deg, #c0c0c0, #e8e8e8);
+            color: #0a0a0a;
+        }
+
+        .badge-semi {
+            background: linear-gradient(45deg, #cd7f32, #daa520);
+            color: white;
+        }
+
+        .badge-amateur {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #0a0a0a;
+        }
+
+        .badge-rookie {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #00ff88;
+            font-size: 1.2rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .table-header,
+            .team-row {
+                grid-template-columns: 40px 60px 1fr 80px 80px;
+                gap: 10px;
+                font-size: 0.9rem;
+            }
+
+            .coeficientes-header h1 {
+                font-size: 2rem;
+            }
+
+            .filter-controls {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-circle">
+                    <img src="/img/ASP LOGO.png" alt="ASP LOGO" class="logo-img">
+                </div>
+                <span>ASP</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="index.html#liga" class="nav-link">La Liga</a></li>
+                <li><a href="index.html#clubes" class="nav-link">Clubes</a></li>
+                <li><a href="index.html#temporada" class="nav-link">Temporada</a></li>
+                <li><a href="clips.html" class="nav-link">Clips</a></li>
+                <li><a href="jugadores.html" class="nav-link">Jugadores</a></li>
+                <li><a href="standings.html" class="nav-link">Posiciones</a></li>
+                <li><a href="coeficientes.html" class="nav-link active">Coeficientes</a></li>
+                <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="coeficientes-container">
+        <div class="coeficientes-header">
+            <h1>Coeficientes ASP</h1>
+            <p>Ranking de todos los equipos basado en rendimiento histórico</p>
+        </div>
+
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="elite">Elite</button>
+            <button class="filter-btn" data-filter="pro">Pro</button>
+            <button class="filter-btn" data-filter="semi">Semi-Pro</button>
+            <button class="filter-btn" data-filter="amateur">Amateur</button>
+            <button class="filter-btn" data-filter="rookie">Rookie</button>
+        </div>
+
+        <div class="coeficientes-table">
+            <div class="table-header">
+                <div>Pos</div>
+                <div>Logo</div>
+                <div>Equipo</div>
+                <div>Coeficiente</div>
+                <div>Partidos</div>
+                <div>Victorias</div>
+                <div>Goles</div>
+                <div>Categoría</div>
+            </div>
+            
+            <div id="teams-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span style="margin-left: 10px;">Cargando coeficientes...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="coeficientes.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -730,6 +730,9 @@
             <button class="admin-tab-btn" data-tab="playoffs">
                 <i class="fas fa-medal"></i> Playoffs
             </button>
+            <button class="admin-tab-btn" data-tab="sanciones">
+                <i class="fas fa-gavel"></i> Sanciones
+            </button>
             <button class="admin-tab-btn" data-tab="clips">
                 <i class="fas fa-video"></i> Clips
             </button>
@@ -1044,6 +1047,64 @@
 
         <!-- Sección de configuración eliminada -->
 
+        <!-- Sanctions Section -->
+        <div class="admin-section" id="sanciones">
+            <h2><i class="fas fa-gavel"></i> Gestión de Sanciones</h2>
+            
+            <div class="form-container" style="background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                <h3 style="color: #00ff88; margin-top: 0;">Aplicar Nueva Sanción</h3>
+                
+                <div class="form-group">
+                    <label for="sanctionTeam">Equipo:</label>
+                    <select id="sanctionTeam" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;">
+                        <option value="">Cargando equipos...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sanctionPoints">Puntos (positivo para sumar, negativo para restar):</label>
+                    <input type="number" id="sanctionPoints" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;" min="-100" max="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sanctionReason">Motivo:</label>
+                    <input type="text" id="sanctionReason" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;" placeholder="Ej: Tarjeta roja, conducta antideportiva, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sanctionPublic"> Hacer esta sanción pública
+                    </label>
+                </div>
+                
+                <button id="applySanction" class="btn btn-primary" style="background: #00ff88; color: #000; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    <i class="fas fa-gavel"></i> Aplicar Sanción
+                </button>
+            </div>
+
+            <h3>Historial de Sanciones</h3>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>Equipo</th>
+                            <th>Puntos</th>
+                            <th>Motivo</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Pública</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sanctionsList">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 20px;">Cargando sanciones...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Playoffs Section -->
         <div class="admin-section" id="playoffs">
             <h2><i class="fas fa-medal"></i> Gestión de Playoffs</h2>
@@ -1167,9 +1228,49 @@
                     <div style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 5px;">Esto puede tomar unos segundos</div>
                 </div>
             </div>
-            
-            <!-- Resultados de verificación -->
-            <div id="verificationResults" style="display: none;"></div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="sanctionTeam">Equipo</label>
+                        <select id="sanctionTeam" class="form-control" required>
+                            <option value="">Seleccionar equipo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sanctionPoints">Puntos (+/-)</label>
+                        <input type="number" id="sanctionPoints" class="form-control" required placeholder="Ej: -3 o +2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sanctionReason">Motivo</label>
+                    <input type="text" id="sanctionReason" class="form-control" required placeholder="Razón de la sanción">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="sanctionPublic" class="form-control" style="width: auto;">
+                    <label for="sanctionPublic" style="margin: 0; color: #ccc;">Hacer público en el historial</label>
+                </div>
+                <button id="applySanctionBtn" class="btn-primary" style="background: #ff4444; border: none; padding: 12px 25px; margin-top: 10px;">
+                    <i class="fas fa-gavel"></i> Aplicar Sanción
+                </button>
+            </div>
+
+            <h3>Historial de Sanciones</h3>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr style="background: rgba(0, 255, 136, 0.1);">
+                            <th style="padding: 12px; text-align: left;">Fecha</th>
+                            <th style="padding: 12px; text-align: left;">Equipo</th>
+                            <th style="padding: 12px; text-align: center;">Puntos</th>
+                            <th style="padding: 12px; text-align: left;">Motivo</th>
+                            <th style="padding: 12px; text-align: center;">Estado</th>
+                            <th style="padding: 12px; text-align: center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sanctionsList">
+                        <!-- Sanciones se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Playoffs Section -->
@@ -1399,5 +1500,253 @@
     </div>
 
     <script src="admin.js"></script>
+    <script>
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load teams and sanctions when the page loads
+            loadTeams();
+            loadSanctions();
+
+            // Handle apply sanction button click
+            document.getElementById('applySanction').addEventListener('click', applySanction);
+
+            // Load teams from API
+            async function loadTeams() {
+                try {
+                    const response = await fetch('/api/teams/dropdown');
+                    const teams = await response.json();
+                    const select = document.getElementById('sanctionTeam');
+                    
+                    // Clear loading message
+                    select.innerHTML = '<option value="">Seleccionar equipo</option>';
+                    
+                    // Add teams to dropdown
+                    teams.forEach(team => {
+                        const option = document.createElement('option');
+                        option.value = team._id;
+                        option.textContent = team.name;
+                        select.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading teams:', error);
+                    alert('Error al cargar los equipos. Por favor recarga la página.');
+                }
+            }
+
+            // Load sanctions from API
+            async function loadSanctions() {
+                try {
+                    console.log('Cargando sanciones...');
+                    const response = await fetch('/api/admin/sanctions');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    
+                    const sanctions = await response.json();
+                    console.log('Sanciones cargadas:', sanctions);
+                    const tbody = document.getElementById('sanctionsList');
+                    
+                    // Clear loading message
+                    tbody.innerHTML = '';
+                    
+                    if (sanctions.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="7" style="text-align: center; padding: 20px;">No hay sanciones registradas</td>';
+                        tbody.appendChild(row);
+                        return;
+                    }
+                    
+                    // Add sanctions to table
+                    sanctions.forEach(sanction => {
+                        const row = document.createElement('tr');
+                        const points = parseInt(sanction.points);
+                        const pointsText = points > 0 ? `+${points}` : points;
+                        const pointsClass = points > 0 ? 'text-success' : (points < 0 ? 'text-danger' : '');
+                        
+                        row.innerHTML = `
+                            <td>${sanction.teamName || 'Equipo no encontrado'}</td>
+                            <td class="${pointsClass}" style="font-weight: bold;">${pointsText}</td>
+                            <td>${sanction.reason || 'Sin motivo especificado'}</td>
+                            <td>${new Date(sanction.date).toLocaleDateString()}</td>
+                            <td>${sanction.revoked ? 'Revocada' : 'Activa'}</td>
+                            <td>${sanction.isPublic ? 'Sí' : 'No'}</td>
+                            <td style="text-align: center;">
+                                ${!sanction.revoked ? `
+                                    <button class="btn btn-sm btn-danger revoke-sanction" data-id="${sanction._id}" title="Revertir sanción">
+                                        <i class="fas fa-undo"></i> Revertir
+                                    </button>
+                                ` : ''}
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    // Add event listeners to revoke buttons
+                    document.querySelectorAll('.revoke-sanction').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const sanctionId = this.getAttribute('data-id');
+                            if (confirm('¿Estás seguro de que deseas revertir esta sanción?')) {
+                                revokeSanction(sanctionId);
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error loading sanctions:', error);
+                    const tbody = document.getElementById('sanctionsList');
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 20px; color: #ff6b6b;">
+                                Error al cargar las sanciones. Por favor recarga la página.
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // Aplicar nueva sanción
+            async function applySanction() {
+                const teamSelect = document.getElementById('sanctionTeam');
+                const teamId = teamSelect.value;
+                const teamName = teamSelect.options[teamSelect.selectedIndex].text;
+                const points = document.getElementById('sanctionPoints').value;
+                const reason = document.getElementById('sanctionReason').value;
+                const isPublic = document.getElementById('sanctionPublic').checked;
+                
+                console.log('Datos del equipo:', { teamId, teamName, points, reason, isPublic });
+
+                if (!teamId || points === '' || !reason) {
+                    alert('Por favor completa todos los campos obligatorios.');
+                    return;
+                }
+
+                // Mostrar mensaje de carga
+                const applyBtn = document.getElementById('applySanction');
+                const originalBtnText = applyBtn.innerHTML;
+                applyBtn.disabled = true;
+                applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aplicando...';
+
+                try {
+                    console.log('Enviando datos:', { teamId, points, reason, isPublic });
+                    const response = await fetch('/api/sanctions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            teamId: teamId,
+                            teamName: teamName,
+                            points: parseInt(points),
+                            reason: reason,
+                            isPublic: isPublic,
+                            matchId: null
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Error al aplicar la sanción');
+                    }
+
+                    alert('✅ Sanción aplicada correctamente');
+                    
+                    // Resetear formulario
+                    document.getElementById('sanctionPoints').value = '';
+                    document.getElementById('sanctionReason').value = '';
+                    document.getElementById('sanctionPublic').checked = false;
+                    
+                    // Recargar lista de sanciones
+                    loadSanctions();
+                    
+                } catch (error) {
+                    console.error('Error al aplicar sanción:', error);
+                    alert(`❌ Error: ${error.message || 'No se pudo aplicar la sanción'}`);
+                } finally {
+                    // Restaurar botón
+                    applyBtn.disabled = false;
+                    applyBtn.innerHTML = originalBtnText;
+                }
+            }
+
+            // Revoke a sanction
+            async function revokeSanction(sanctionId) {
+                try {
+                    const response = await fetch(`/api/sanctions/${sanctionId}/revoke`, {
+                        method: 'PUT'
+                    });
+
+                    if (response.ok) {
+                        alert('Sanción revocada correctamente.');
+                        // Reload sanctions
+                        loadSanctions();
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Error al revocar la sanción');
+                    }
+                } catch (error) {
+                    console.error('Error revoking sanction:', error);
+                    alert(`Error: ${error.message || 'No se pudo revocar la sanción'}`);
+                }
+            }
+            // Get all tab buttons and sections
+            const tabButtons = document.querySelectorAll('.admin-tab-btn');
+            const tabSections = document.querySelectorAll('.admin-section');
+            
+            // Function to show a specific tab and hide others
+            function showTab(tabId) {
+                // Hide all sections
+                tabSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Remove active class from all buttons
+                tabButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                // Show the selected section
+                const selectedSection = document.getElementById(tabId);
+                if (selectedSection) {
+                    selectedSection.classList.add('active');
+                }
+                
+                // Find and activate the clicked button
+                const activeButton = document.querySelector(`.admin-tab-btn[data-tab="${tabId}"]`);
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+                
+                // Store the active tab in localStorage
+                localStorage.setItem('lastActiveTab', tabId);
+            }
+            
+            // Add click event listeners to all tab buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    if (tabId) {
+                        showTab(tabId);
+                    }
+                });
+            });
+            
+            // Check for a previously active tab in localStorage
+            const lastActiveTab = localStorage.getItem('lastActiveTab');
+            if (lastActiveTab) {
+                showTab(lastActiveTab);
+            } else if (tabButtons.length > 0) {
+                // If no saved tab, activate the first one
+                const firstTab = tabButtons[0].getAttribute('data-tab');
+                if (firstTab) {
+                    showTab(firstTab);
+                }
+            }
+            
+            // Make the showTab function available globally
+            window.showTab = showTab;
+        });
+    </script>
 </body>
 </html>
