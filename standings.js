@@ -1131,13 +1131,15 @@ function loadResults() {
     // Actualizar número máximo de jornadas dinámicamente
     const maxJornadas = getMaxMatchdays();
 
-    // Filtrar partidos terminados de la jornada actual desde fixturesData
-    const matchdayResults = fixturesData.filter(match => {
+    // Filtrar partidos terminados de la jornada actual desde resultsData
+    const matchdayResults = resultsData.filter(match => {
         // Si matchday es undefined, asumimos que es jornada 1
         const matchMatchday = match.matchday || 1;
-        // Solo mostrar partidos terminados en la pestaña de resultados
-        return matchMatchday === currentMatchday && match.status === 'finished';
+        // Mostrar partidos terminados de la jornada actual
+        return matchMatchday === currentMatchday;
     });
+    
+    console.log('📊 Resultados encontrados para la jornada', currentMatchday, ':', matchdayResults.length);
     
     // Create matchday navigation controls for results
     if (resultsContainer) {
