@@ -871,6 +871,11 @@
         <div class="admin-section" id="matches">
             <h2><i class="fas fa-futbol"></i> Gestión de Partidos</h2>
             
+            <!-- Lista de Partidos -->
+            <div class="matches-grid" id="matchesGrid" style="margin-top: 30px;">
+                <!-- Matches will be loaded here -->
+            </div>
+            
             <!-- Generación Automática de Partidos -->
             <div class="auto-match-generator" style="background: rgba(157, 78, 221, 0.1); border: 2px solid var(--accent-purple); border-radius: 10px; padding: 20px; margin-bottom: 30px;">
                 <h3><i class="fas fa-magic"></i> Generar Partidos Automáticamente</h3>
@@ -1030,10 +1035,6 @@
             <div class="transfers-grid" id="adminTransfersGrid" style="margin-top: 30px;">
                 <!-- Transfers will be loaded here -->
             </div>
-
-            <div class="matches-grid" id="matchesGrid">
-                <!-- Matches will be loaded here -->
-            </div>
         </div>
 
         <!-- Results Section -->
@@ -1046,64 +1047,6 @@
         </div>
 
         <!-- Sección de configuración eliminada -->
-
-        <!-- Sanctions Section -->
-        <div class="admin-section" id="sanciones">
-            <h2><i class="fas fa-gavel"></i> Gestión de Sanciones</h2>
-            
-            <div class="form-container" style="background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
-                <h3 style="color: #00ff88; margin-top: 0;">Aplicar Nueva Sanción</h3>
-                
-                <div class="form-group">
-                    <label for="sanctionTeam">Equipo:</label>
-                    <select id="sanctionTeam" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;">
-                        <option value="">Cargando equipos...</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sanctionPoints">Puntos (positivo para sumar, negativo para restar):</label>
-                    <input type="number" id="sanctionPoints" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;" min="-100" max="100">
-                </div>
-                
-                <div class="form-group">
-                    <label for="sanctionReason">Motivo:</label>
-                    <input type="text" id="sanctionReason" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;" placeholder="Ej: Tarjeta roja, conducta antideportiva, etc.">
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sanctionPublic"> Hacer esta sanción pública
-                    </label>
-                </div>
-                
-                <button id="applySanction" class="btn btn-primary" style="background: #00ff88; color: #000; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    <i class="fas fa-gavel"></i> Aplicar Sanción
-                </button>
-            </div>
-
-            <h3>Historial de Sanciones</h3>
-            <div class="table-responsive" style="overflow-x: auto;">
-                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr>
-                            <th>Equipo</th>
-                            <th>Puntos</th>
-                            <th>Motivo</th>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th>Pública</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sanctionsList">
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 20px;">Cargando sanciones...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
         <!-- Playoffs Section -->
         <div class="admin-section" id="playoffs">
@@ -1175,6 +1118,64 @@
             </div>
         </div>
 
+        <!-- Sanciones Section -->
+        <div class="admin-section" id="sanciones">
+            <h2><i class="fas fa-gavel"></i> Gestión de Sanciones</h2>
+            
+            <div class="form-container" style="background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                <h3 style="color: #00ff88; margin-top: 0;">Aplicar Nueva Sanción</h3>
+                
+                <div class="form-group">
+                    <label for="sanctionTeam">Equipo:</label>
+                    <select id="sanctionTeam" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;">
+                        <option value="">Cargando equipos...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sanctionPoints">Puntos (positivo para sumar, negativo para restar):</label>
+                    <input type="number" id="sanctionPoints" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;" min="-100" max="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sanctionReason">Motivo:</label>
+                    <input type="text" id="sanctionReason" class="form-control" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88; color: white; border-radius: 4px;" placeholder="Ej: Tarjeta roja, conducta antideportiva, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sanctionPublic"> Hacer esta sanción pública
+                    </label>
+                </div>
+                
+                <button id="applySanction" class="btn btn-primary" style="background: #00ff88; color: #000; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    <i class="fas fa-gavel"></i> Aplicar Sanción
+                </button>
+            </div>
+
+            <h3>Historial de Sanciones</h3>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>Equipo</th>
+                            <th>Puntos</th>
+                            <th>Motivo</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Pública</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sanctionsList">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 20px;">Cargando sanciones...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Clips Section -->
         <div class="admin-section" id="clips">
             <h2><i class="fas fa-video"></i> Gestión de Clips</h2>
@@ -1228,50 +1229,6 @@
                     <div style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 5px;">Esto puede tomar unos segundos</div>
                 </div>
             </div>
-                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-                    <div class="form-group">
-                        <label for="sanctionTeam">Equipo</label>
-                        <select id="sanctionTeam" class="form-control" required>
-                            <option value="">Seleccionar equipo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="sanctionPoints">Puntos (+/-)</label>
-                        <input type="number" id="sanctionPoints" class="form-control" required placeholder="Ej: -3 o +2">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="sanctionReason">Motivo</label>
-                    <input type="text" id="sanctionReason" class="form-control" required placeholder="Razón de la sanción">
-                </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="sanctionPublic" class="form-control" style="width: auto;">
-                    <label for="sanctionPublic" style="margin: 0; color: #ccc;">Hacer público en el historial</label>
-                </div>
-                <button id="applySanctionBtn" class="btn-primary" style="background: #ff4444; border: none; padding: 12px 25px; margin-top: 10px;">
-                    <i class="fas fa-gavel"></i> Aplicar Sanción
-                </button>
-            </div>
-
-            <h3>Historial de Sanciones</h3>
-            <div class="table-responsive" style="overflow-x: auto;">
-                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr style="background: rgba(0, 255, 136, 0.1);">
-                            <th style="padding: 12px; text-align: left;">Fecha</th>
-                            <th style="padding: 12px; text-align: left;">Equipo</th>
-                            <th style="padding: 12px; text-align: center;">Puntos</th>
-                            <th style="padding: 12px; text-align: left;">Motivo</th>
-                            <th style="padding: 12px; text-align: center;">Estado</th>
-                            <th style="padding: 12px; text-align: center;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sanctionsList">
-                        <!-- Sanciones se cargarán aquí -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
         <!-- Playoffs Section -->
         <div class="admin-section" id="playoffs">

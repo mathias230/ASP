@@ -2138,7 +2138,7 @@ function renderMatches() {
                     <span><i class="fas fa-futbol"></i> Jornada ${matchday}</span>
                 </div>
                 <div style="margin-top: 15px; text-align: center;">
-                    <button class="btn btn-danger" onclick="deleteMatch(${matchId})" style="background: #ff4757; border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer;">
+                    <button class="btn btn-danger" onclick="deleteMatch('${matchId}')" style="background: #ff4757; border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer;">
                         <i class="fas fa-trash"></i> Eliminar
                     </button>
                 </div>
@@ -6049,31 +6049,50 @@ function editMatch(matchId) {
 }
 
 // Función para eliminar partido
-function deleteMatch(matchId) {
+async function deleteMatch(matchId) {
     console.log('🗑️ ELIMINANDO PARTIDO:', matchId);
     
     if (!confirm('¿Estás seguro de que quieres eliminar este partido?')) {
         return;
     }
     
-    fetch(`/api/matches/${matchId}`, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+        // Verificar autenticación
+        const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true';
+        if (!isAuthenticated) {
+            throw new Error('No estás autenticado. Por favor, inicia sesión nuevamente.');
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('✅ Partido eliminado exitosamente:', data);
-        showNotification('Partido eliminado exitosamente', 'success');
-        // No necesitamos recargar manualmente - el WebSocket se encarga
-    })
-    .catch(error => {
-        console.error('❌ Error eliminando partido:', error);
-        showNotification('Error eliminando partido', 'error');
-    });
+        
+        const response = await fetch(`/api/matches/${matchId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include' // Incluir cookies de sesión
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Error al eliminar el partido');
+        }
+        
+        // Mostrar notificación de éxito
+        showNotification('Partido eliminado correctamente', 'success');
+        
+        // Recargar la lista de partidos
+        loadMatches();
+        
+    } catch (error) {
+        console.error('Error al eliminar el partido:', error);
+        showNotification(`Error al eliminar el partido: ${error.message}`, 'error');
+        
+        // Si el error es de autenticación, redirigir al login
+        if (error.message.includes('No estás autenticado') || error.message.includes('token')) {
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        }
+    }
 }
 
 // Funciones de Copa eliminadas
