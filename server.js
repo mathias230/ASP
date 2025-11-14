@@ -316,16 +316,112 @@ loadClips();
 
 // ==================== ENDPOINTS MONGODB ====================
 
-// Obtener todos los equipos
+// Get teams for dropdown
+app.get('/api/teams/dropdown', async (req, res) => {
+    try {
+        const teams = await Team.find({}, 'name _id').sort({ name: 1 });
+        res.json(teams);
+    } catch (error) {
+        console.error('Error getting teams for dropdown:', error);
+        res.status(500).json({ error: 'Error al obtener la lista de equipos' });
+    }
+});
+
+// Get all teams with details
 app.get('/api/teams', async (req, res) => {
     try {
         const teams = await Team.find().sort({ name: 1 });
         res.json(teams);
     } catch (error) {
-        console.error('❌ Error obteniendo equipos:', error);
-        res.status(500).json({ error: 'Error obteniendo equipos' });
+        console.error('Error getting teams:', error);
+        res.status(500).json({ error: 'Error al obtener los equipos' });
     }
 });
+
+// Get single team by ID
+app.get('/api/teams/:id', async (req, res) => {
+    try {
+        const team = await Team.findById(req.params.id);
+        if (!team) {
+            return res.status(404).json({ error: 'Equipo no encontrado' });
+        }
+        res.json(team);
+    } catch (error) {
+        console.error('Error getting team:', error);
+        res.status(500).json({ error: 'Error al obtener el equipo' });
+    }
+});
+
+// Update team
+app.put('/api/teams/:id', uploadImage.single('logo'), async (req, res) => {
+    try {
+        const { name, stadium } = req.body;
+        const updateData = { name, stadium };
+
+        // Handle logo upload if present
+        if (req.file) {
+            const result = await cloudinary.uploader.upload_stream(
+                { resource_type: 'auto' },
+                async (error, result) => {
+                    if (error) throw error;
+                    updateData.logo = result.secure_url;
+                    
+                    const updatedTeam = await Team.findByIdAndUpdate(
+                        req.params.id,
+                        updateData,
+                        { new: true }
+                    );
+                    
+                    if (!updatedTeam) {
+                        return res.status(404).json({ error: 'Equipo no encontrado' });
+                    }
+                    
+                    // Emit update to all connected clients
+                    io.emit('teamsUpdate', await Team.find().sort({ name: 1 }));
+                    res.json(updatedTeam);
+                }
+            ).end(req.file.buffer);
+        } else {
+            const updatedTeam = await Team.findByIdAndUpdate(
+                req.params.id,
+                updateData,
+                { new: true }
+            );
+            
+            if (!updatedTeam) {
+                return res.status(404).json({ error: 'Equipo no encontrado' });
+            }
+            
+            // Emit update to all connected clients
+            io.emit('teamsUpdate', await Team.find().sort({ name: 1 }));
+            res.json(updatedTeam);
+        }
+    } catch (error) {
+        console.error('Error updating team:', error);
+        res.status(500).json({ error: 'Error al actualizar el equipo' });
+    }
+});
+
+// Get matches
+app.get('/api/matches', async (req, res) => {
+    try {
+        const matches = []; // Placeholder - implement your match fetching logic here
+        res.json(matches);
+    } catch (error) {
+        console.error('Error getting matches:', error);
+        res.status(500).json({ error: 'Error al obtener los partidos' });
+    }
+});
+
+// Get sanctions (placeholder - implement as needed)
+app.get('/api/admin/sanctions', (req, res) => {
+    // Placeholder - implement sanctions logic
+    res.json([]);
+});
+
+// ==================== ENDPOINTS MONGODB ====================
+
+// Team endpoints are now consolidated above
 
 // Crear equipo
 app.post('/api/teams', uploadImage.single('teamLogo'), async (req, res) => {

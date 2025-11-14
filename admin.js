@@ -344,27 +344,86 @@ function toggleModalValueField() {
     }
 };
 
-// Global variables
-let teams = [];
-let clubs = [];
-let players = [];
-let transfers = [];
+// Global variables - check if already declared
+if (typeof window.__ADMIN_INITIALIZED__ === 'undefined') {
+    window.__ADMIN_INITIALIZED__ = true;
+    
+    // Initialize global variables only once
+    if (typeof window.teams === 'undefined') window.teams = [];
+    if (typeof window.clubs === 'undefined') window.clubs = [];
+    if (typeof window.players === 'undefined') window.players = [];
+    if (typeof window.transfers === 'undefined') window.transfers = [];
+    
+    // Create global references
+    var teams = window.teams;
+    var clubs = window.clubs;
+    var players = window.players;
+    var transfers = window.transfers;
+}
 
 // Funciones de equipos (disponibles globalmente desde el inicio)
 window.editTeam = function(teamId) {
-    const team = teams.find(t => t.id === teamId);
-    if (!team) return;
+    console.log('🔍 [EDIT TEAM] Editando equipo con ID:', teamId);
     
-    // Llenar formulario con datos del equipo
-    document.getElementById('teamId').value = team.id;
-    document.getElementById('teamName').value = team.name;
+    // Buscar el equipo por ID o _ID (compatibilidad con diferentes formatos)
+    const team = teams.find(t => t.id === teamId || t._id === teamId);
     
-    // Cambiar texto del botón y mostrar cancelar
-    document.getElementById('teamFormAction').textContent = 'Actualizar Equipo';
-    document.getElementById('cancelTeamBtn').style.display = 'inline-block';
+    if (!team) {
+        console.error('❌ [EDIT TEAM] No se encontró el equipo con ID:', teamId);
+        showNotification('No se pudo encontrar el equipo seleccionado', 'error');
+        return;
+    }
     
-    // Scroll al formulario
-    document.getElementById('teamForm').scrollIntoView({ behavior: 'smooth' });
+    console.log('🔍 [EDIT TEAM] Equipo encontrado:', team);
+    
+    try {
+        // Llenar formulario con datos del equipo
+        const teamForm = document.getElementById('teamForm');
+        if (!teamForm) {
+            console.error('❌ [EDIT TEAM] No se encontró el formulario de equipo');
+            return;
+        }
+        
+        // Usar el campo correcto para el ID (id o _id)
+        const teamIdField = document.getElementById('teamId');
+        if (teamIdField) {
+            teamIdField.value = team._id || team.id;
+            console.log('✅ [EDIT TEAM] ID del equipo establecido:', teamIdField.value);
+        }
+        
+        const teamNameField = document.getElementById('teamName');
+        if (teamNameField) {
+            teamNameField.value = team.name || '';
+            console.log('✅ [EDIT TEAM] Nombre del equipo establecido:', teamNameField.value);
+        }
+        
+        // Mostrar imagen actual si existe
+        const currentLogo = document.getElementById('currentTeamLogo');
+        if (currentLogo && team.logo) {
+            currentLogo.src = team.logo;
+            currentLogo.style.display = 'block';
+        }
+        
+        // Cambiar texto del botón y mostrar cancelar
+        const submitButton = document.getElementById('teamFormAction');
+        if (submitButton) {
+            submitButton.textContent = 'Actualizar Equipo';
+            submitButton.classList.add('updating');
+        }
+        
+        const cancelButton = document.getElementById('cancelTeamBtn');
+        if (cancelButton) {
+            cancelButton.style.display = 'inline-block';
+        }
+        
+        // Scroll al formulario
+        teamForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        console.log('✅ [EDIT TEAM] Formulario preparado para edición');
+    } catch (error) {
+        console.error('❌ [EDIT TEAM] Error al preparar el formulario:', error);
+        showNotification('Error al cargar los datos del equipo', 'error');
+    }
 };
 
 window.cancelTeamEdit = function() {
@@ -958,6 +1017,7 @@ async function handleTeamSubmit(e) {
     
     const originalFormData = new FormData(e.target);
     const teamId = originalFormData.get('teamId');
+    const isEdit = !!teamId;
     
     // Validar datos
     const teamName = originalFormData.get('teamName')?.trim();
@@ -966,52 +1026,87 @@ async function handleTeamSubmit(e) {
         return;
     }
     
-    // Crear nuevo FormData con los campos correctos para el backend
-    const formData = new FormData();
-    formData.append('name', teamName); // Backend espera 'name', no 'teamName'
-    
-    // Agregar logo si existe
-    const logoFile = originalFormData.get('teamLogo');
-    if (logoFile && logoFile.size > 0) {
-        formData.append('logo', logoFile); // Backend espera 'logo', no 'teamLogo'
-    }
-    
-    // Agregar teamId si existe (para edición)
-    if (teamId) {
-        formData.append('teamId', teamId);
-    }
+    // Mostrar indicador de carga
+    const submitButton = document.getElementById('teamFormAction');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
     
     try {
-        const url = teamId ? `/api/teams/${teamId}` : '/api/teams';
-        const method = teamId ? 'PUT' : 'POST';
+        // Crear nuevo FormData con los campos correctos para el backend
+        const formData = new FormData();
+        formData.append('name', teamName);
         
-        console.log('🚀 Enviando equipo:', {
+        // Agregar logo si existe
+        const logoFile = originalFormData.get('teamLogo');
+        if (logoFile && logoFile.size > 0) {
+            formData.append('logo', logoFile);
+        }
+        
+        const url = isEdit ? `/api/teams/${teamId}` : '/api/teams';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        console.log('🚀 [TEAM SUBMIT] Enviando datos del equipo:', {
+            teamId,
             name: teamName,
-            hasLogo: logoFile && logoFile.size > 0,
-            method: method,
-            url: url
+            hasLogo: !!(logoFile && logoFile.size > 0),
+            method,
+            url
         });
         
         const response = await fetch(url, {
-            method: method,
+            method,
             body: formData
         });
         
-        if (response.ok) {
-            const action = teamId ? 'actualizado' : 'agregado';
-            showNotification(`Equipo ${action} exitosamente`, 'success');
-            
-            // Limpiar formulario y recargar
-            e.target.reset();
-            cancelTeamEdit();
-            await loadTeams();
-        } else {
-            const error = await response.json();
-            showNotification(error.error || 'Error guardando equipo', 'error');
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || 'Error al guardar el equipo');
         }
+        
+        const result = await response.json();
+        console.log('✅ [TEAM SUBMIT] Equipo guardado exitosamente:', result);
+        
+        // Mostrar notificación
+        showNotification(
+            `Equipo ${isEdit ? 'actualizado' : 'agregado'} exitosamente`,
+            'success'
+        );
+        
+        // Limpiar formulario
+        e.target.reset();
+        cancelTeamEdit();
+        
+        // Recargar equipos
+        await loadTeams();
+        
+        // Notificar a otros clientes a través de WebSocket
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.emit('teamUpdated', {
+                teamId: result._id || teamId,
+                action: isEdit ? 'updated' : 'created',
+                team: result
+            });
+            console.log('📢 [WEBSOCKET] Notificación de actualización de equipo enviada');
+        }
+        
+        // Actualizar la pestaña de partidos si está abierta
+        if (document.querySelector('#matches-tab')?.classList.contains('active')) {
+            loadMatches();
+        }
+        
     } catch (error) {
-        console.error('Error submitting team:', error);
-        showNotification('Error de conexión', 'error');
+        console.error('❌ [TEAM SUBMIT] Error al guardar el equipo:', error);
+        showNotification(
+            `Error al ${isEdit ? 'actualizar' : 'crear'} el equipo: ${error.message}`,
+            'error'
+        );
+    } finally {
+        // Restaurar botón
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+        }
     }
 }
 
@@ -6568,7 +6663,6 @@ function switchTab(tabName) {
         case 'teams':
             setupTransferForm();
             setupQuickTransferForm();
-            setupOCRVerification();
             loadTeams();
             loadClubs();
             loadPlayers();
