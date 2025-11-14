@@ -230,15 +230,24 @@ let totalAssists = 0;
 
 // Función para obtener el número máximo de jornadas dinámicamente
 function getMaxMatchdays() {
-    if (!fixturesData || fixturesData.length === 0) {
-        return 3; // Valor por defecto
+    let maxMatchday = 1;
+    
+    // Check fixtures data
+    if (fixturesData && fixturesData.length > 0) {
+        const maxFixturesMatchday = Math.max(...fixturesData.map(match => match.matchday || 1));
+        maxMatchday = Math.max(maxMatchday, maxFixturesMatchday);
     }
     
-    // Encontrar la jornada más alta en los datos
-    const maxMatchday = Math.max(...fixturesData.map(match => match.matchday || 1));
-    maxMatchdays = Math.max(maxMatchday, 1); // Asegurar que sea al menos 1
+    // Check results data
+    if (resultsData && resultsData.length > 0) {
+        const maxResultsMatchday = Math.max(...resultsData.map(match => match.matchday || 1));
+        maxMatchday = Math.max(maxMatchday, maxResultsMatchday);
+    }
     
-    console.log(`📊 Jornadas detectadas dinámicamente: ${maxMatchdays}`);
+    // Ensure we always return at least 1
+    maxMatchdays = Math.max(maxMatchday, 1);
+    
+    console.log(`📊 Jornadas detectadas dinámicamente: ${maxMatchdays} (fixtures: ${fixturesData?.length || 0}, results: ${resultsData?.length || 0})`);
     return maxMatchdays;
 }
 
